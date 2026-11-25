@@ -1,16 +1,18 @@
-#!name=SideStore Loopback
-#!desc=把发往 10.7.0.1 的连接反射回本机协议栈，替代 LocalDevVPN/StosVPN 供 SideStore 续签使用。需要 Loon Build 1007+。
+#!name=Roam Control & SideStore Loopback
+#!desc=把发往 10.7.0.1 与 10.7.1.1 的连接反射回本机协议栈，同时支持 Roam Control 模拟定位与 SideStore 续签。
 #!author=fox
 #!loon_version=3.5.3(1007)
 #!system=iOS
 #!type=normal
 
 [General]
-# 只把 SideStore 需要的单个地址塞进 TUN，不接管其它流量
-include-tun = 10.7.0.1/32
-# 避免有工具去挑 IPv6 虚拟接口
-ipv6-vif = off
+# 同时接管设备端与隧道端点地址，满足 Roam Control 与 SideStore 需求
+include-tun = 10.7.0.1/32, 10.7.1.1/32
+# 跳过代理防止本地回环被节点分流
+skip-proxy = 10.7.0.1, 10.7.1.1, localhost, *.local
+# 允许虚拟网卡使用 IPv6 以适配 iOS 27 设备隧道握手
+ipv6-vif = auto
 
 [IP Rewrite]
-# 目的 10.7.0.1 的包交换源/目的后回注本机，命中设备自己的 remotepairingd:49152
 10.7.0.1 = reflect
+10.7.1.1 = reflect
